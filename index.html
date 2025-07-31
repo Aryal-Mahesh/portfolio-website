@@ -1,46 +1,61 @@
+# Update the HTML to include previous portfolio details with the new Coffee Reviews page as a separate section
+full_html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mahesh Aryal | Portfolio</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
+    body {{
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       background: #f4f4f4;
       color: #333;
-    }
-    header {
+    }}
+    header {{
       background: #333;
       color: #fff;
       padding: 2rem;
       text-align: center;
-    }
-    nav a {
+    }}
+    nav a {{
       margin: 0 1rem;
       color: #fff;
       text-decoration: none;
-    }
-    section {
+    }}
+    section {{
       max-width: 800px;
       margin: 2rem auto;
       padding: 1rem;
       background: #fff;
       border-radius: 5px;
-    }
-    footer {
+    }}
+    footer {{
       text-align: center;
       padding: 1rem;
       background: #333;
       color: #fff;
       margin-top: 2rem;
-    }
-    ul {
-      padding-left: 1.5rem;
-    }
+    }}
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+    }}
+    th, td {{
+      padding: 0.5rem;
+      border-bottom: 1px solid #ddd;
+    }}
+    form label {{
+      display: block;
+      margin-top: 1rem;
+    }}
+    form input {{
+      width: 100%;
+      padding: 0.5rem;
+    }}
   </style>
 </head>
 <body>
@@ -51,6 +66,7 @@
     <nav>
       <a href="#about">About</a>
       <a href="#projects">Projects</a>
+      <a href="#coffee">Coffee</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -68,6 +84,21 @@
     </ul>
   </section>
 
+  <section id="coffee">
+    <h2>Coffee Explorations</h2>
+    <p>Exploring espresso and coffee culture from around the world. Each visit brings new aroma, taste, and story.</p>
+    <form id="coffeeForm">
+      <h3>Add a Coffee Review</h3>
+      <label>Coffee Shop: <input type="text" id="shop" required></label>
+      <label>Location: <input type="text" id="location" required></label>
+      <label>Date Visited: <input type="date" id="date" required></label>
+      <label>Notes: <input type="text" id="notes" required></label>
+      <label>Rating (1–5): <input type="number" id="rating" min="1" max="5" step="0.1" required></label>
+      <br><br>
+      <button type="submit">Submit Review</button>
+    </form>
+  </section>
+
   <section id="contact">
     <h2>Contact</h2>
     <p>Email: <a href="mailto:mahesh.aryal@ndsu.edu">mahesh.aryal@ndsu.com</a></p>
@@ -79,5 +110,44 @@
     <p>&copy; 2025 Mahesh Aryal</p>
   </footer>
 
+  <script>
+    document.getElementById("coffeeForm").addEventListener("submit", function(e) {{
+      e.preventDefault();
+
+      const data = {{
+        shop: document.getElementById("shop").value,
+        location: document.getElementById("location").value,
+        date: document.getElementById("date").value,
+        notes: document.getElementById("notes").value,
+        rating: document.getElementById("rating").value
+      }};
+
+      fetch("https://script.google.com/macros/s/AKfycbzzBTBet-hPncVwy97M0bVg7bPofDj5lluye7k1-jS0bs1LJiVk6kj5vv70Hj-Lu1Be/exec", {{
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {{
+          "Content-Type": "application/json"
+        }}
+      }})
+      .then(res => res.json())
+      .then(response => {{
+        alert("Review submitted successfully!");
+        document.getElementById("coffeeForm").reset();
+      }})
+      .catch(error => {{
+        alert("Error submitting review.");
+        console.error("Error:", error);
+      }});
+    }});
+  </script>
+
 </body>
 </html>
+"""
+
+file_path_full = "/mnt/data/mahesh_portfolio_with_coffee.html"
+with open(file_path_full, "w") as f:
+    f.write(full_html)
+
+file_path_full
+
