@@ -76,7 +76,7 @@
       <label>Date Visited: <input type="date" id="date" required></label>
       <label>Notes: <input type="text" id="notes" required></label>
       <label>Rating (1–5): <input type="number" id="rating" min="1" max="5" step="0.1" required></label>
-      <label>Image URL (optional): <input type="text" id="imageurl" placeholder="https://..."></label>
+      <label>Upload Image: <input type="file" id="image" accept="image/*"></label>
       <br><br>
       <button type="submit">Submit Review</button>
     </form>
@@ -90,63 +90,81 @@
   </footer>
 
   <script>
-    const apiURL = "https://script.google.com/macros/s/AKfycbzzBTBet-hPncVwy97M0bVg7bPofDj5lluye7k1-jS0bs1LJiVk6kj5vv70Hj-Lu1Be/exec";
-
-    function loadReviews() {
-      fetch(apiURL)
-        .then(response => response.json())
-        .then(data => {
-          const container = document.getElementById("reviewsContainer");
-          container.innerHTML = "";
-          data.reverse().forEach(row => {
-            const div = document.createElement("div");
-            div.className = "review-block";
-            div.innerHTML = `
-              <h4>${row.shop}</h4>
-              <p><strong>Location:</strong> ${row.location}</p>
-              <p><strong>Date:</strong> ${row.date}</p>
-              <p><strong>Notes:</strong> ${row.notes}</p>
-              <p><strong>Rating:</strong> ${row.rating}</p>
-              ${row.imageurl ? `<img src="${row.imageurl}" alt="Coffee image">` : ""}
-            `;
-            container.appendChild(div);
-          });
-        })
-        .catch(error => console.error("Error loading reviews:", error));
+    const apiURL ="https://script.google.com/macros/library/d/18-pZgP829sw4PU08Svijd0ws_JMnyDDjiHH8FyHBBdrzkMKTBXwQr8Uv/2"
+    async function loadReviews() {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+      const container = document.getElementById("reviewsContainer");
+      container.innerHTML = "";
+      data.reverse().forEach(row => {
+        const div = document.createElement("div");
+        div.className = "review-block";
+        div.innerHTML = `
+          <h4>${row[0]}</h4>
+          <p><strong>Location:</strong> ${row[1]}</p>
+          <p><strong>Date:</strong> ${row[2]}</p>
+          <p><strong>Notes:</strong> ${row[3]}</p>
+          <p><strong>Rating:</strong> ${row[4]}</p>
+          ${row[5] ? `<img src="${row[5]}" alt="Uploaded Coffee Image">` : ""}
+        `;
+        container.appendChild(div);
+      });
     }
 
-    document.getElementById("coffeeForm").addEventListener("submit", function(e) {
+    document.getElementById("coffeeForm").addEventListener("submit", async function(e) {
       e.preventDefault();
 
-      const data = {
-        shop: document.getElementById("shop").value,
-        location: document.getElementById("location").value,
-        date: document.getElementById("date").value,
-        notes: document.getElementById("notes").value,
-        rating: document.getElementById("rating").value,
-        imageurl: document.getElementById("imageurl").value
-      };
+      const shop = document.getElementById("shop").value;
+      const location = document.getElementById("location").value;
+      const date = document.getElementById("date").value;
+      const notes = document.getElementById("notes").value;
+      const rating = document.getElementById("rating").value;
+      const imageFile = document.getElementById("image").files[0];
+
+      let base64Image = "";
+      let mimeType = "";
+      let filename = "";
+
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        await new Promise(resolve => {
+          reader.onload = () => {
+            const result = reader.result;
+            mimeType = result.split(";")[0].split(":")[1];
+            base64Image = result.split(",")[1];
+            filename = imageFile.name;
+            resolve();
+          };
+        });
+      }
+
+      const formData = new URLSearchParams();
+      formData.append("shop", shop);
+      formData.append("location", location);
+      formData.append("date", date);
+      formData.append("notes", notes);
+      formData.append("rating", rating);
+      formData.append("filename", filename);
+      formData.append("mimeType", mimeType);
+      formData.append("image", base64Image);
 
       fetch(apiURL, {
         method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
+        body: formData,
       })
       .then(res => res.json())
       .then(response => {
-        alert("Review submitted successfully!");
+        alert("Review submitted!");
         document.getElementById("coffeeForm").reset();
         loadReviews();
       })
       .catch(error => {
-        alert("Error submitting review.");
-        console.error("Error:", error);
+        console.error("Error submitting review:", error);
+        alert("Failed to submit review.");
       });
     });
 
-    // Load reviews on page load
     window.onload = loadReviews;
   </script>
 
