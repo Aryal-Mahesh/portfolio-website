@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,49 +6,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Coffee | Mahesh Aryal</title>
   <style>
-    body {{
+    body {
       font-family: Arial, sans-serif;
       background: #f4f4f4;
       margin: 0;
       padding: 0;
       color: #333;
-    }}
-    header, footer {{
+    }
+    header, footer {
       background: #333;
       color: #fff;
       text-align: center;
       padding: 1rem;
-    }}
-    nav {{
+    }
+    nav {
       margin-top: 0.5rem;
-    }}
-    nav a {{
+    }
+    nav a {
       margin: 0 1rem;
       color: #fff;
       text-decoration: none;
-    }}
-    section {{
-      max-width: 800px;
+    }
+    section {
+      max-width: 900px;
       margin: 2rem auto;
       background: #fff;
       padding: 1rem;
       border-radius: 5px;
-    }}
-    form label {{
-      display: block;
+    }
+    img.review-photo {
+      max-width: 100%;
+      height: auto;
       margin-top: 1rem;
-    }}
-    form input {{
-      width: 100%;
-      padding: 0.5rem;
-    }}
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .review-block {
+      border-bottom: 1px solid #ddd;
+      padding: 1rem 0;
+    }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Mahesh Aryal</h1>
-    <p>Physicist | Computational Researcher | Molecular Dynamics | DFT | Machine Learning</p>
+    <p>Physicist | Computational Researcher | Coffee Explorer</p>
     <nav>
       <a href="index.html">Home</a>
       <a href="projects.html">Projects</a>
@@ -60,53 +64,30 @@
 
   <section>
     <h2>Coffee Explorations</h2>
-    <p>Reviews and notes from coffee shops I visit.</p>
-    <form id="coffeeForm">
-      <h3>Add a Coffee Review</h3>
-      <label>Coffee Shop: <input type="text" id="shop" required></label>
-      <label>Location: <input type="text" id="location" required></label>
-      <label>Date Visited: <input type="date" id="date" required></label>
-      <label>Notes: <input type="text" id="notes" required></label>
-      <label>Rating (1–5): <input type="number" id="rating" min="1" max="5" step="0.1" required></label>
-      <br><br>
-      <button type="submit">Submit Review</button>
-    </form>
+    <p>Exploring taste, place, and experience — one espresso at a time.</p>
+
+    <div class="review-block">
+      <h3>Verve Coffee Roasters</h3>
+      <p><strong>Location:</strong> Santa Cruz, CA</p>
+      <p><strong>Date:</strong> 2025-07-28</p>
+      <p><strong>Notes:</strong> Fruity acidity, silky crema, bright finish.</p>
+      <p><strong>Rating:</strong> 4.5 / 5</p>
+      <img src="images/verve_espresso.jpg" alt="Espresso at Verve" class="review-photo" />
+    </div>
+
+    <div class="review-block">
+      <h3>Blue Bottle Coffee</h3>
+      <p><strong>Location:</strong> Los Angeles, CA</p>
+      <p><strong>Date:</strong> 2025-07-20</p>
+      <p><strong>Notes:</strong> Balanced, rich espresso with dark chocolate tones.</p>
+      <p><strong>Rating:</strong> 4.8 / 5</p>
+      <img src="images/blue_bottle.jpg" alt="Espresso at Blue Bottle" class="review-photo" />
+    </div>
   </section>
 
   <footer>
     <p>&copy; 2025 Mahesh Aryal</p>
   </footer>
-
-  <script>
-    document.getElementById("coffeeForm").addEventListener("submit", function(e) {{
-      e.preventDefault();
-
-      const data = {{
-        shop: document.getElementById("shop").value,
-        location: document.getElementById("location").value,
-        date: document.getElementById("date").value,
-        notes: document.getElementById("notes").value,
-        rating: document.getElementById("rating").value
-      }};
-
-      fetch("https://script.google.com/macros/s/AKfycbzzBTBet-hPncVwy97M0bVg7bPofDj5lluye7k1-jS0bs1LJiVk6kj5vv70Hj-Lu1Be/exec", {{
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {{
-          "Content-Type": "application/json"
-        }}
-      }})
-      .then(res => res.json())
-      .then(response => {{
-        alert("Review submitted successfully!");
-        document.getElementById("coffeeForm").reset();
-      }})
-      .catch(error => {{
-        alert("Error submitting review.");
-        console.error("Error:", error);
-      }});
-    }});
-  </script>
 
 </body>
 </html>
