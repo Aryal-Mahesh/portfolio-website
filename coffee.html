@@ -3,171 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Coffee | Mahesh Aryal</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    header, footer {
-      background: #333;
-      color: #fff;
-      text-align: center;
-      padding: 1rem;
-    }
-    nav {
-      margin-top: 0.5rem;
-    }
-    nav a {
-      margin: 0 1rem;
-      color: #fff;
-      text-decoration: none;
-    }
-    section {
-      max-width: 900px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 5px;
-    }
-    form label {
-      display: block;
-      margin-top: 1rem;
-    }
-    form input {
-      width: 100%;
-      padding: 0.5rem;
-    }
-    .review-block {
-      border-bottom: 1px solid #ddd;
-      padding: 1rem 0;
-    }
-    .review-block img {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-top: 0.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-  </style>
+  <title>Coffee Reviews</title>
 </head>
 <body>
+  <h1>Coffee Review</h1>
+  <form id="reviewForm">
+    <label>Coffee Shop: <input name="shop" required /></label><br/>
+    <label>Location: <input name="location" required /></label><br/>
+    <label>Date: <input name="date" type="date" required /></label><br/>
+    <label>Notes: <textarea name="notes" required></textarea></label><br/>
+    <label>Rating: <input name="rating" type="number" step="0.1" min="0" max="5" required /></label><br/>
+    <label>Image: <input name="image" type="file" accept="image/*" /></label><br/>
+    <button type="submit">Submit</button>
+  </form>
 
-  <header>
-    <h1>Mahesh Aryal</h1>
-    <p>Physicist | Computational Researcher | Coffee Explorer</p>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="coffee.html">Coffee</a>
-      <a href="books.html">Books</a>
-      <a href="tutorials.html">Tutorials</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </header>
-
-  <section>
-    <h2>Coffee Explorations</h2>
-    <form id="coffeeForm">
-      <label>Coffee Shop: <input type="text" id="shop" required></label>
-      <label>Location: <input type="text" id="location" required></label>
-      <label>Date Visited: <input type="date" id="date" required></label>
-      <label>Notes: <input type="text" id="notes" required></label>
-      <label>Rating (1–5): <input type="number" id="rating" min="1" max="5" step="0.1" required></label>
-      <label>Upload Image: <input type="file" id="image" accept="image/*"></label>
-      <br><br>
-      <button type="submit">Submit Review</button>
-    </form>
-
-    <h3>Past Reviews</h3>
-    <div id="reviewsContainer"></div>
-  </section>
-
-  <footer>
-    <p>&copy; 2025 Mahesh Aryal</p>
-  </footer>
+  <h2>All Reviews</h2>
+  <div id="reviews"></div>
 
   <script>
-    const apiURL = "https://script.google.com/macros/library/d/1B4GpLYkpcrxNikftAAEISe5eTfeFATT2Uq34hNnS9bISUR7aanwYRCJi/3";
+    const apiURL = "https://script.google.com/macros/s/AKfycbyXg6ilSnT7-HpOp6kTE-PTlcNiGTaL4ipGxSKBg2cvSEbHCoId7bTMJFX_lICJaO3bVw/exec";
 
-    async function loadReviews() {
-      const res = await fetch(apiURL);
-      const data = await res.json();
-      const container = document.getElementById("reviewsContainer");
-      container.innerHTML = "";
-      data.reverse().forEach(row => {
-        const div = document.createElement("div");
-        div.className = "review-block";
-        div.innerHTML = `
-          <h4>${row[0]}</h4>
-          <p><strong>Location:</strong> ${row[1]}</p>
-          <p><strong>Date:</strong> ${row[2]}</p>
-          <p><strong>Notes:</strong> ${row[3]}</p>
-          <p><strong>Rating:</strong> ${row[4]}</p>
-          ${row[5] ? `<img src="${row[5]}" alt="Uploaded Coffee Image">` : ""}
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    document.getElementById("coffeeForm").addEventListener("submit", async function(e) {
+    document.getElementById("reviewForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const fileInput = form.image.files[0];
 
-      const shop = document.getElementById("shop").value;
-      const location = document.getElementById("location").value;
-      const date = document.getElementById("date").value;
-      const notes = document.getElementById("notes").value;
-      const rating = document.getElementById("rating").value;
-      const imageFile = document.getElementById("image").files[0];
-
-      let base64Image = "";
-      let mimeType = "";
-      let filename = "";
-
-      if (imageFile) {
+      if (fileInput) {
         const reader = new FileReader();
-        reader.readAsDataURL(imageFile);
-        await new Promise(resolve => {
-          reader.onload = () => {
-            const result = reader.result;
-            mimeType = result.split(";")[0].split(":")[1];
-            base64Image = result.split(",")[1];
-            filename = imageFile.name;
-            resolve();
-          };
-        });
+        reader.onload = async () => {
+          const base64Image = reader.result.split(',')[1];
+          const payload = new FormData();
+          payload.append("shop", form.shop.value);
+          payload.append("location", form.location.value);
+          payload.append("date", form.date.value);
+          payload.append("notes", form.notes.value);
+          payload.append("rating", form.rating.value);
+          payload.append("image", base64Image);
+          payload.append("filename", fileInput.name);
+          payload.append("mimeType", fileInput.type);
+
+          try {
+            const res = await fetch(apiURL, {
+              method: "POST",
+              body: payload
+            });
+            const data = await res.json();
+            console.log("Upload response:", data);
+            alert("Review submitted successfully!");
+            loadReviews();
+          } catch (err) {
+            console.error("Submission error:", err);
+            alert("Failed to submit review.");
+          }
+        };
+        reader.readAsDataURL(fileInput);
+      } else {
+        const payload = new FormData(form);
+        try {
+          const res = await fetch(apiURL, {
+            method: "POST",
+            body: payload
+          });
+          const data = await res.json();
+          console.log("Upload response (no image):", data);
+          alert("Review submitted successfully!");
+          loadReviews();
+        } catch (err) {
+          console.error("Submission error:", err);
+          alert("Failed to submit review.");
+        }
       }
-
-      const formData = new URLSearchParams();
-      formData.append("shop", shop);
-      formData.append("location", location);
-      formData.append("date", date);
-      formData.append("notes", notes);
-      formData.append("rating", rating);
-      formData.append("filename", filename);
-      formData.append("mimeType", mimeType);
-      formData.append("image", base64Image);
-
-      fetch(apiURL, {
-        method: "POST",
-        body: formData,
-      })
-      .then(res => res.json())
-      .then(response => {
-        alert("Review submitted!");
-        document.getElementById("coffeeForm").reset();
-        loadReviews();
-      })
-      .catch(error => {
-        console.error("Error submitting review:", error);
-        alert("Failed to submit review.");
-      });
     });
 
-    window.onload = loadReviews;
-  </script>
+    async function loadReviews() {
+      try {
+        const res = await fetch(apiURL);
+        const reviews = await res.json();
+        console.log("Fetched reviews:", reviews);
 
+        const container = document.getElementById("reviews");
+        container.innerHTML = "";
+        reviews.forEach(([shop, location, date, notes, rating, imageUrl]) => {
+          const div = document.createElement("div");
+          div.innerHTML = `
+            <p><strong>${shop}</strong> (${location}, ${date})<br/>
+            Rating: ${rating}/5<br/>
+            ${notes}<br/>
+            ${imageUrl ? `<img src="${imageUrl}" style="max-width:200px;" />` : ""}</p><hr/>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Load reviews error:", err);
+      }
+    }
+
+    loadReviews();
+  </script>
 </body>
 </html>
